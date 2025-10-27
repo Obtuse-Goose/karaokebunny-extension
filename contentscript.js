@@ -324,7 +324,7 @@ let KaraokeBunny = {
 				});
 			}
 			
-			new QRCode(document.getElementById("karaokebunny-qrcode"), "https://app.karaokebunny.com/#" + KaraokeBunny.roomCode);
+			new QRCode(document.getElementById("karaokebunny-qrcode"), "https://app.karaokebunny.com/#search/" + KaraokeBunny.roomCode);
 
 			console.log('Room code: ' + KaraokeBunny.roomCode);
 

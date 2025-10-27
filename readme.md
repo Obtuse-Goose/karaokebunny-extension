@@ -2,7 +2,7 @@
 
 Play Karaoke from a web browser. Queue songs straight from your phone!
 
-See also the KaraokeBunny mobile app that allows users to manag the play queue: https://github.com/Obtuse-Goose/karaokebunny-app
+See also the KaraokeBunny mobile app that allows users to manage the play queue: https://github.com/Obtuse-Goose/karaokebunny-app
 
 Credits:
 QR Code generator: David Shim JS https://davidshimjs.github.io/qrcodejs/
