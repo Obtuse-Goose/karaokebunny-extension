@@ -1,0 +1,67 @@
+{
+    "version": "0.0.1",
+    "permissions": [
+        "activeTab",
+        "storage"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Load KaraokeBunny!",
+        "default_icon": {
+            "24": "img/icon24.png",
+            "48": "img/icon48.png"
+        }
+    },
+    "icons": {
+        "48": "img/icon48.png",
+        "128": "img/icon128.png",
+        "24": "img/icon24.png"
+    },
+    "name": "KaraokeBunny",
+    "short_name": "KaraokeBunny",
+    "description": "Turn your lounge into the ultimate Karaoke room! Play from your web browser, queue songs straight from your phone.",
+    "author": "Obtuse Goose Ltd",
+    "manifest_version": 3,
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "karaokebunny-amo@autocardanywhere.com"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+        //"scripts": [
+        //    "background.js"
+        //]
+    },
+    "content_scripts": [
+        {
+            "all_frames": false,
+            "run_at": "document_start",
+            "js": [
+                "libs\/jquery-3.6.0.min.js",
+                "libs\/qrcode.min.js",
+                "contentscript.js"
+            ],
+            "matches": [
+                "https://*.youtube.com/*"
+            ]
+        }
+    ],
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "karaokebunny.css"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}
