@@ -46,46 +46,39 @@ let KaraokeBunny = {
 	sleep: function(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	},
-	getCurrentUrl: function() {
-		if (typeof(window) === 'undefined') {return ''}
-		if (typeof(window.document) === 'undefined') {return ''}
-		if (typeof(window.document.location) === 'undefined') {return ''}
-		return window.document.location.href.toLowerCase();
+	nextSong: function(song) {
+		let timeout = 5;
+		$('.karaokebunny-current-title').text('Next up: ' + song.title);
+		$('.karaokebunny-current-artist').text('in ' + timeout);
+		$('.karaokebunny-current-duration').text('');
+
+		function countdown() {
+			timeout--;
+			$('.karaokebunny-current-artist').text('in ' + timeout);
+			if (timeout == 1) {
+				window.location = 'https://www.youtube.com/watch?v=' + song.video_id + '#KaraokeBunny';
+			}
+		}
+		setInterval(countdown, 1000);
 	},
-	nextVideo: function() {
+	videoEnded: function() {
 		KaraokeBunny.videoEnded = true;
 
-		let song = KaraokeBunny.queue[KaraokeBunny.currentPosition-1];
+		let currentSong = KaraokeBunny.queue[0];
 
-		/*
-		Was going to delete the finished song from the queue here but don't think it's necessary as it'll get cleared when we load the next video anyway.
-		$.ajax({
-			url: 'https://api.karaokebunny.com/queue/' + KaraokeBunny.roomCode + '/' + song.song_id, 
-			method: 'DELETE',
-			crossDomain: true
-		});
-		*/
-
-		if (KaraokeBunny.queue.length > KaraokeBunny.currentPosition) {
-			let nextSong = KaraokeBunny.queue[KaraokeBunny.currentPosition];
-
-			let timeout = 5;
-			$('.karaokebunny-current-title').text('Next up: ' + nextSong.title);
-			$('.karaokebunny-current-artist').text('in ' + timeout);
-
-			function countdown() {
-				timeout--;
-				$('.karaokebunny-added-by').text('in ' + timeout);
-				if (timeout == 1) {
-					window.location = 'https://www.youtube.com/watch?v=' + nextSong.video_id + '#KaraokeBunny';
-				}
-				setTimeout(countdown, 1000);
-			}
-			setTimeout(countdown, 1000);
+		if (KaraokeBunny.queue.length > 1) {
+			KaraokeBunny.nextSong(KaraokeBunny.queue[1]);
 		}
-		else {
+		else { // Queue is empty
+			$.ajax({
+				url: 'https://api.karaokebunny.com/queue/' + KaraokeBunny.roomCode + '/' + currentSong.song_id, 
+				method: 'DELETE',
+				crossDomain: true
+			});
+
 			$('.karaokebunny-current-title').text('Queue empty');
 			$('.karaokebunny-current-artist').text('Time for another song?');
+			$('.karaokebunny-current-duration').text('');
 		}
 	},
 	setFullScreen: function() {
@@ -139,7 +132,6 @@ let KaraokeBunny = {
 		console.log(queue);
 		if (queue.length == 0) return;
 		if (JSON.stringify(KaraokeBunny.queue) == JSON.stringify(queue)) {
-			console.log('moot');
 			return;
 		}
 
@@ -212,6 +204,9 @@ let KaraokeBunny = {
 		$('.karaokebunny-queue').replaceWith(queueDiv);
 	},
 	initialise: async function() {
+		let params = new URLSearchParams(document.location.search);
+		KaraokeBunny.nowPlaying = params.get("v");
+
 		let body = null;
 
 		while (body === null || body.length == 0) {
@@ -231,6 +226,18 @@ let KaraokeBunny = {
 			await KaraokeBunny.sleep(10);
 		}
 		$('.ytp-play-button').click();
+
+		let promoDiv = $('div.promo-title');
+		if (promoDiv.text() == "This video isn\'t available anymore") {
+			console.log('video not available');
+			$.ajax({
+				url: 'https://api.karaokebunny.com/video/' + KaraokeBunny.nowPlaying, 
+				method: 'DELETE',
+				crossDomain: true
+			});
+			KaraokeBunny.refresh();
+			return;
+		}
 
 		// Replace the non video elements with our own queue and track display
 		// Create header
@@ -301,14 +308,11 @@ let KaraokeBunny = {
 		
 		// Setup video finish event handler
 		let video = $('video').get(0);
-		video.addEventListener('ended', KaraokeBunny.nextVideo);
+		video.addEventListener('ended', KaraokeBunny.videoEnded);
 		//console.log(video);
 		//console.log($('#ytd-player'));
 		
 		$('body').show("slow");
-
-		let params = new URLSearchParams(document.location.search);
-		KaraokeBunny.nowPlaying = params.get("v");
 		
 		// Get the room code from local storage
 		browser.storage.local.get(['roomCode'], async function(data) {
