@@ -93,7 +93,6 @@ let KaraokeBunny = {
 		}
 	},
 	refresh: function() {
-		console.log('refresh');
 		$.ajax({
 			url: 'https://api.karaokebunny.com/queue/' + KaraokeBunny.roomCode, 
 			method: 'GET',
