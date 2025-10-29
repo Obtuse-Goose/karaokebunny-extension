@@ -149,6 +149,7 @@ let KaraokeBunny = {
 
 		// If the current song isn't in the queue at all, redirect to the first song.
 		if (KaraokeBunny.currentPosition === 0) {
+			//console.log(queue[0]);
 			window.location = 'https://www.youtube.com/watch?v=' + queue[0].video_id + '#KaraokeBunny';
 			return;
 		}
@@ -226,18 +227,6 @@ let KaraokeBunny = {
 		}
 		$('.ytp-play-button').click();
 
-		let promoDiv = $('div.promo-title');
-		if (promoDiv.text() == "This video isn\'t available anymore") {
-			console.log('video not available');
-			$.ajax({
-				url: 'https://api.karaokebunny.com/video/' + KaraokeBunny.nowPlaying, 
-				method: 'DELETE',
-				crossDomain: true
-			});
-			KaraokeBunny.refresh();
-			return;
-		}
-
 		// Replace the non video elements with our own queue and track display
 		// Create header
 		let header = document.createElement("div");
@@ -247,6 +236,68 @@ let KaraokeBunny = {
 		//button.appendChild(document.createTextNode("Go Fullscreen"));
 		button.className = 'js-toggle-fullscreen-btn toggle-fullscreen-btn';
 		button.title = 'Enter fullscreen mode';
+
+		let svg = document.createElement("svg");
+		svg.className = "toggle-fullscreen-svg";
+		svg.setAttribute("width", "28");
+		svg.setAttribute("height", "28");
+		svg.setAttribute("viewBox", "-2 -2 28 28");
+		let g1 = document.createElement("g");
+		g1.className = "icon-fullscreen-enter";
+		let path1 = document.createElement("path");
+		path1.setAttribute("d", "M 2 9 v -7 h 7");
+		g1.appendChild(path1);
+		let path2 = document.createElement("path");
+		path2.setAttribute("d", "M 22 9 v -7 h -7");
+		g1.appendChild(path2);
+		let path3 = document.createElement("path");
+		path3.setAttribute("d", "M 22 15 v 7 h -7");
+		g1.appendChild(path3);
+		let path4 = document.createElement("path");
+		path4.setAttribute("d", "M 2 15 v 7 h 7");
+		g1.appendChild(path4);
+		svg.appendChild(g1);
+
+		let g2 = document.createElement("g");
+		g2.className = "icon-fullscreen-leave";
+		let path5 = document.createElement("path");
+		path5.setAttribute("d", "M 24 17 h -7 v 7");
+		g2.appendChild(path5);
+		let path6 = document.createElement("path");
+		path6.setAttribute("d", "M 0 17 h 7 v 7");
+		g2.appendChild(path6);
+		let path7 = document.createElement("path");
+		path7.setAttribute("d", "M 0 7 h 7 v -7");
+		g2.appendChild(path7);
+		let path8 = document.createElement("path");
+		path8.setAttribute("d", "M 24 7 h -7 v -7");
+		g2.appendChild(path8);
+		svg.appendChild(g2);
+		//button.appendChild(svg);
+
+		
+/*
+		<button class="js-toggle-fullscreen-btn toggle-fullscreen-btn" title="Enter fullscreen mode"><svg class="toggle-fullscreen-svg" width="28" height="28" viewbox="-2 -2 28 28"><g class="icon-fullscreen-enter"><path d="M 2 9 v -7 h 7"></path><path d="M 22 9 v -7 h -7"></path><path d="M 22 15 v 7 h -7"></path><path d="M 2 15 v 7 h 7"></path></g>
+		<g class="icon-fullscreen-leave"><path d="M 24 17 h -7 v 7"></path><path d="M 0 17 h 7 v 7"></path><path d="M 0 7 h 7 v -7"></path><path d="M 24 7 h -7 v -7"></path></g></svg></button>
+		<button class="js-toggle-fullscreen-btn toggle-fullscreen-btn" title="Enter fullscreen mode">
+			<svg class="toggle-fullscreen-svg" width="28" height="28" viewBox="-2 -2 28 28">
+				<g class="icon-fullscreen-enter">
+					<path d="M 2 9 v -7 h 7"></path>
+					<path d="M 22 9 v -7 h -7"></path>
+					<path d="M 22 15 v 7 h -7"></path>
+					<path d="M 2 15 v 7 h 7"></path>
+				</g>
+				
+				<g class="icon-fullscreen-leave">
+					<path d="M 24 17 h -7 v 7"></path>
+					<path d="M 0 17 h 7 v 7"></path>
+					<path d="M 0 7 h 7 v -7"></path>
+					<path d="M 24 7 h -7 v -7"></path>
+				</g>
+			</svg>
+		</button>
+		*/
+
 
 		button.innerHTML = `
 			<svg class="toggle-fullscreen-svg" width="28" height="28" viewBox="-2 -2 28 28">
@@ -265,6 +316,8 @@ let KaraokeBunny = {
 				</g>
 			</svg>
 		`;
+		
+		
 		$(button).on("click", KaraokeBunny.setFullScreen);
 		header.appendChild(button);
 		$('#masthead').replaceWith(header);
@@ -331,42 +384,29 @@ let KaraokeBunny = {
 
 			console.log('Room code: ' + KaraokeBunny.roomCode);
 
-			KaraokeBunny.apiRequest('queue/' + KaraokeBunny.roomCode).then((response) => {
-				KaraokeBunny.loadQueue(response);
-			});
+			let promoDiv = $('div.promo-title');
+			if (promoDiv.text() == "This video isn\'t available anymore") {
+				console.log('video not available');
+				$.ajax({
+					url: 'https://api.karaokebunny.com/video/' + KaraokeBunny.roomCode + '/' + KaraokeBunny.nowPlaying, 
+					method: 'DELETE',
+					crossDomain: true,
+					success: function(response) {
+						KaraokeBunny.loadQueue(JSON.parse(response));
+					}
+				});
+			}
+			else {
+				KaraokeBunny.apiRequest('queue/' + KaraokeBunny.roomCode).then((response) => {
+					KaraokeBunny.loadQueue(response);
+				});
+			}
+
+
+			KaraokeBunny.timer = setInterval(KaraokeBunny.refresh, 5000);
+			KaraokeBunny.loaded = true;
 		});
-
-
-
-		KaraokeBunny.timer = setInterval(KaraokeBunny.refresh, 5000);
-		
-		KaraokeBunny.loaded = true;
-		/*
-		var skip = null;
-		while (skip === null) {
-			skip = qs('.ytp-skip-ad-button');
-			await KaraokeBunny.sleep(10);
-		}
-		skip.click();
-		*/
 	}
-	/*
-	saveSettings: function(settings) {
-		KaraokeBunny.sendMessage({'name': 'saveSettings', 'prefix': KaraokeBunnySettings.prefix, 'settings': settings});
-	},
-	
-	settingsCallback: function(response) {
-		if (!response) {
-			console.error('Load settings failed');
-			return;
-		}
-		
-		KaraokeBunny.isTouchInterface = ('ontouchstart' in window);
-	
-
-		KaraokeBunny.loaded = true;
-	}
-	*/
 }
 
 if (window.location.hash && window.location.hash == '#KaraokeBunny') {
