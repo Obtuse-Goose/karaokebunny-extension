@@ -10,6 +10,7 @@ function getFile(url, callback) {
 function onRequest(request, sender, sendResponse) {
 
 	if (request.name == "getFile") {
+		console.log(request);
 		getFile(request.url, (response) => {
 			sendResponse({'url': request.url, 'data': response});
 		});
