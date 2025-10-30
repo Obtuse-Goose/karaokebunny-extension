@@ -57,7 +57,8 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "karaokebunny.css"
+                "karaokebunny.css",
+                "img/fullscreen.png"
             ],
             "matches": [
                 "<all_urls>"

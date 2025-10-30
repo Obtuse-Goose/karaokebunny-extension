@@ -3,18 +3,21 @@
         Green #0bf40a
         Blue #00b4d8
         Orange #F97300
+        Purple #B210FD
+        Off White #FDFDFD
 */
 
 ytd-app {
     background-color: #1f1f1f;
     font-family: 'Cal Sans';
+    --main-color: #F97300;
 }
 
 /* Header */
 .karaokebunny-header {
     font-size: 48pt;
     text-align: center;
-    color: #B210FD;
+    color: var(--main-color);
 }
 
 .karaokebunny-header button {
@@ -23,20 +26,42 @@ ytd-app {
     right: 24px;
 }
 
+/* Fullscreen button */
+.toggle-fullscreen-btn {
+	position: fixed;
+	z-index: 10000;
+	top: 10px;
+	right: 10px;
+	border: 0;
+	padding: 0;
+	background: none;
+	cursor: pointer;
+	outline: none;
+}
+
+.fullscreen-image:hover {
+    transform: scale(1.3);
+    transition: all 0.3s cubic-bezier(0.65, 0.05, 0.36, 1);
+}
+
+.fullscreen-image {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Footer */
 .karaokebunny-current-title {
     font-size: 48pt;
-    color: #B210FD;
+    color: var(--main-color);
 }
 
 .karaokebunny-current-artist {
     font-size: 28pt;
-    color: #B210FD;
+    color: var(--main-color);
 }
 
 .karaokebunny-current-duration {
     font-size: 28pt;
-    color: #B210FD;
+    color: var(--main-color);
     float: right;
     text-align: right;
     width: 10%;
@@ -45,12 +70,12 @@ ytd-app {
 
 .karaokebunny-added-by {
     font-size: 20pt;
-    color: #B210FD;
+    color: var(--main-color);
 }
 
 /* Sidebar */
 .karaokebunny-sidebar {
-    color: #B210FD;
+    color: var(--main-color);
     padding-top: 30px;
     max-width: 25vw;
     width: 600px;
@@ -71,7 +96,7 @@ span#karaokebunny-qrcode img {
     font-size: 20pt;
     overflow-x: hidden;
     overflow-y: scroll;
-    scrollbar-color: #B210FD #1f1f1f;
+    scrollbar-color: var(--main-color) #1f1f1f;
     scrollbar-width: thin;
     height: calc(100vh - 440px);
 }
@@ -79,11 +104,11 @@ span#karaokebunny-qrcode img {
 .karaokebunny-queue-title {
     font-size: 28pt;
     padding-right: 20px;
-    border-bottom: 2px solid #B210FD;
+    border-bottom: 2px solid var(--main-color);
 }
 
 .karaokebunny-song + .karaokebunny-song {
-    border-top: 1px solid #B210FD;
+    border-top: 1px solid var(--main-color);
 }
 
 .karaokebunny-song {
@@ -92,7 +117,7 @@ span#karaokebunny-qrcode img {
 }
 
 .karaokebunny-song a {
-    color: #B210FD;
+    color: var(--main-color);
     text-decoration: none;
 }
 
@@ -110,61 +135,4 @@ span#karaokebunny-qrcode img {
     text-align: right;
     width: 10%;
     padding-right: 15px;
-}
-
-
-/* Fullscreen button */
-.toggle-fullscreen-btn {
-	position: fixed;
-	z-index: 10000;
-	top: 10px;
-	right: 10px;
-	border: 0;
-	padding: 0;
-	background: none;
-	cursor: pointer;
-	outline: none;
-}
-
-.toggle-fullscreen-svg {
-	display: block;
-	height: auto;
-}
-
-.toggle-fullscreen-svg path {
-	transform-box: view-box;
-	transform-origin: 12px 12px;
-	fill: none;
-	stroke: #B210FD;
-	stroke-width: 4;
-	transition: .15s;
-}
-
-.toggle-fullscreen-btn:hover path:nth-child(1),
-.toggle-fullscreen-btn:focus path:nth-child(1) {
-	transform: translate(-2px, -2px);
-}
-
-.toggle-fullscreen-btn:hover path:nth-child(2),
-.toggle-fullscreen-btn:focus path:nth-child(2) {
-	transform: translate(2px, -2px);
-}
-
-.toggle-fullscreen-btn:hover path:nth-child(3),
-.toggle-fullscreen-btn:focus path:nth-child(3) {
-	transform: translate(2px, 2px);
-}
-
-.toggle-fullscreen-btn:hover path:nth-child(4),
-.toggle-fullscreen-btn:focus path:nth-child(4) {
-	transform: translate(-2px, 2px);
-}
-
-
-.toggle-fullscreen-btn:not(.on) .icon-fullscreen-leave {
-	display: none;
-}
-
-.toggle-fullscreen-btn.on .icon-fullscreen-enter {
-	display: none;
 }

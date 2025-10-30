@@ -237,86 +237,10 @@ let KaraokeBunny = {
 		button.className = 'js-toggle-fullscreen-btn toggle-fullscreen-btn';
 		button.title = 'Enter fullscreen mode';
 
-		let svg = document.createElement("svg");
-		svg.className = "toggle-fullscreen-svg";
-		svg.setAttribute("width", "28");
-		svg.setAttribute("height", "28");
-		svg.setAttribute("viewBox", "-2 -2 28 28");
-		let g1 = document.createElement("g");
-		g1.className = "icon-fullscreen-enter";
-		let path1 = document.createElement("path");
-		path1.setAttribute("d", "M 2 9 v -7 h 7");
-		g1.appendChild(path1);
-		let path2 = document.createElement("path");
-		path2.setAttribute("d", "M 22 9 v -7 h -7");
-		g1.appendChild(path2);
-		let path3 = document.createElement("path");
-		path3.setAttribute("d", "M 22 15 v 7 h -7");
-		g1.appendChild(path3);
-		let path4 = document.createElement("path");
-		path4.setAttribute("d", "M 2 15 v 7 h 7");
-		g1.appendChild(path4);
-		svg.appendChild(g1);
-
-		let g2 = document.createElement("g");
-		g2.className = "icon-fullscreen-leave";
-		let path5 = document.createElement("path");
-		path5.setAttribute("d", "M 24 17 h -7 v 7");
-		g2.appendChild(path5);
-		let path6 = document.createElement("path");
-		path6.setAttribute("d", "M 0 17 h 7 v 7");
-		g2.appendChild(path6);
-		let path7 = document.createElement("path");
-		path7.setAttribute("d", "M 0 7 h 7 v -7");
-		g2.appendChild(path7);
-		let path8 = document.createElement("path");
-		path8.setAttribute("d", "M 24 7 h -7 v -7");
-		g2.appendChild(path8);
-		svg.appendChild(g2);
-		//button.appendChild(svg);
-
-		
-/*
-		<button class="js-toggle-fullscreen-btn toggle-fullscreen-btn" title="Enter fullscreen mode"><svg class="toggle-fullscreen-svg" width="28" height="28" viewbox="-2 -2 28 28"><g class="icon-fullscreen-enter"><path d="M 2 9 v -7 h 7"></path><path d="M 22 9 v -7 h -7"></path><path d="M 22 15 v 7 h -7"></path><path d="M 2 15 v 7 h 7"></path></g>
-		<g class="icon-fullscreen-leave"><path d="M 24 17 h -7 v 7"></path><path d="M 0 17 h 7 v 7"></path><path d="M 0 7 h 7 v -7"></path><path d="M 24 7 h -7 v -7"></path></g></svg></button>
-		<button class="js-toggle-fullscreen-btn toggle-fullscreen-btn" title="Enter fullscreen mode">
-			<svg class="toggle-fullscreen-svg" width="28" height="28" viewBox="-2 -2 28 28">
-				<g class="icon-fullscreen-enter">
-					<path d="M 2 9 v -7 h 7"></path>
-					<path d="M 22 9 v -7 h -7"></path>
-					<path d="M 22 15 v 7 h -7"></path>
-					<path d="M 2 15 v 7 h 7"></path>
-				</g>
-				
-				<g class="icon-fullscreen-leave">
-					<path d="M 24 17 h -7 v 7"></path>
-					<path d="M 0 17 h 7 v 7"></path>
-					<path d="M 0 7 h 7 v -7"></path>
-					<path d="M 24 7 h -7 v -7"></path>
-				</g>
-			</svg>
-		</button>
-		*/
-
-
-		button.innerHTML = `
-			<svg class="toggle-fullscreen-svg" width="28" height="28" viewBox="-2 -2 28 28">
-				<g class="icon-fullscreen-enter">
-					<path d="M 2 9 v -7 h 7" />
-					<path d="M 22 9 v -7 h -7" />
-					<path d="M 22 15 v 7 h -7" />
-					<path d="M 2 15 v 7 h 7" />
-				</g>
-				
-				<g class="icon-fullscreen-leave">
-					<path d="M 24 17 h -7 v 7" />
-					<path d="M 0 17 h 7 v 7" />
-					<path d="M 0 7 h 7 v -7" />
-					<path d="M 24 7 h -7 v -7" />
-				</g>
-			</svg>
-		`;
-		
+		let img = document.createElement("img");
+		img.src = KaraokeBunny.getURL('img/fullscreen.png');
+		img.className = 'fullscreen-image';
+		button.appendChild(img);
 		
 		$(button).on("click", KaraokeBunny.setFullScreen);
 		header.appendChild(button);
