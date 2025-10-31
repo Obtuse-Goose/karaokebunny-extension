@@ -235,9 +235,6 @@ let KaraokeBunny = {
 			player = document.querySelector('#ytd-player');
 			await KaraokeBunny.sleep(10);
 		}
-		if (KaraokeBunny.isDevMode()) {
-			$('.ytp-play-button').click();
-		}
 
 		// Replace the non video elements with our own queue and track display
 		// Create header
@@ -299,6 +296,14 @@ let KaraokeBunny = {
 		KaraokeBunny.video.addEventListener('ended', KaraokeBunny.videoEnded);
 		//console.log(video);
 		//console.log($('#ytd-player'));
+
+		if (KaraokeBunny.isDevMode()) {
+			console.log('dev mode');
+			KaraokeBunny.video.pause();
+		}
+		else {
+			KaraokeBunny.video.play();
+		}
 		
 		$('body').show("slow");
 		
