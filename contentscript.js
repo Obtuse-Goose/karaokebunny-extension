@@ -348,4 +348,9 @@ let KaraokeBunny = {
 if (window.location.hash && window.location.hash == '#KaraokeBunny') {
 	KaraokeBunny.initialise();
 }
+if (window.location.host.toLowerCase().indexOf("karaokebunny.com") > -1) {
+	$(document).ready(function() {
+		$('body').addClass('karaokebunny-extension-running');
+	});
+}
 
