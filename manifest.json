@@ -27,7 +27,10 @@
     "manifest_version": 3,
     "browser_specific_settings": {
         "gecko": {
-            "id": "karaokebunny-amo@karaokebunny.com"
+            "id": "karaokebunny-amo@karaokebunny.com",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
         }
     },
     "background": {
