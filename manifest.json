@@ -27,7 +27,7 @@
     "manifest_version": 3,
     "browser_specific_settings": {
         "gecko": {
-            "id": "karaokebunny-amo@autocardanywhere.com"
+            "id": "karaokebunny-amo@karaokebunny.com"
         }
     },
     "background": {
