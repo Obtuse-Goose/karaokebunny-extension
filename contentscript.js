@@ -4,6 +4,9 @@ let KaraokeBunny = {
 	loaded: false,
 	videoEnded: false,
 	apiUrl: 'https://api.karaokebunny.com/',
+	isDevMode: function() {
+		return !('update_url' in browser.runtime.getManifest());
+	},
 	sendMessage(message) {
 		return new Promise((resolve, reject) => {
 			browser.runtime.sendMessage(message, response => resolve(response));
@@ -232,7 +235,9 @@ let KaraokeBunny = {
 			player = document.querySelector('#ytd-player');
 			await KaraokeBunny.sleep(10);
 		}
-		$('.ytp-play-button').click();
+		if (KaraokeBunny.isDevMode()) {
+			$('.ytp-play-button').click();
+		}
 
 		// Replace the non video elements with our own queue and track display
 		// Create header
