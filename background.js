@@ -27,9 +27,9 @@ browser.runtime.onMessage.addListener(onRequest);
 // Persistent connections
 //browser.runtime.onConnect.addListener(onConnect);
 
-// On first install open the options page
+// On first install launch the video page
 browser.runtime.onInstalled.addListener((details) => {
 	if (details.reason == 'install') {
-		//openURL(browser.runtime.getURL('options.html'));
+		browser.tabs.create({'url': "https://karaokebunny.com/launch/"});
 	}
 });

@@ -128,6 +128,12 @@ let KaraokeBunny = {
 			return result;
 		}
 
+		let durationDiv = $('.karaokebunny-total');
+		if (durationDiv.length == 1) {
+			let total = Math.round(parseInt(durationDiv[0].dataset.duration) - KaraokeBunny.video.currentTime);
+			durationDiv.text(KaraokeBunny.formatDuration(total));
+		}
+
 		console.log(queue);
 		if (queue.length == 0) return;
 		if (JSON.stringify(KaraokeBunny.queue) == JSON.stringify(queue)) {
@@ -167,6 +173,7 @@ let KaraokeBunny = {
 		let totalDuration = 0;
 		for (let i=0; i<queue.length; i++) {
 			let song = queue[i];
+			totalDuration += song.duration;
 			
 			if (song.position == KaraokeBunny.currentPosition) { // Current song
 				$('.karaokebunny-current-title').text(song.title);
@@ -179,7 +186,6 @@ let KaraokeBunny = {
 			//}
 			else if (song.position > KaraokeBunny.currentPosition) {
 				queueDivInner.appendChild(getSongDiv(song));
-				totalDuration += song.duration;
 			}
 		}
 
@@ -192,7 +198,8 @@ let KaraokeBunny = {
 		queueTitle.appendChild(upcoming);
 
 		let duration = document.createElement("div");
-		duration.className = 'karaokebunny-duration';
+		duration.className = 'karaokebunny-duration karaokebunny-total';
+		duration.dataset.duration = totalDuration;
 		duration.appendChild(document.createTextNode(KaraokeBunny.formatDuration(totalDuration)));
 		queueTitle.appendChild(duration);
 
@@ -283,8 +290,8 @@ let KaraokeBunny = {
 
 		
 		// Setup video finish event handler
-		let video = $('video').get(0);
-		video.addEventListener('ended', KaraokeBunny.videoEnded);
+		KaraokeBunny.video = $('video').get(0);
+		KaraokeBunny.video.addEventListener('ended', KaraokeBunny.videoEnded);
 		//console.log(video);
 		//console.log($('#ytd-player'));
 		
