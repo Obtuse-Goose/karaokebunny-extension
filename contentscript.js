@@ -25,6 +25,10 @@ let KaraokeBunny = {
 	apiRequest: function(route) {
 		return new Promise((resolve, reject) => {
 			KaraokeBunny.sendMessage({'name': 'getFile', 'url': KaraokeBunny.apiUrl + route}).then((response) => {
+				if (!response) {
+					console.log('Error getting ' + KaraokeBunny.apiUrl + route);
+					return;
+				}
 				resolve(JSON.parse(response.data));
 			});
 		});
@@ -52,12 +56,12 @@ let KaraokeBunny = {
 	nextSong: function(song) {
 		let timeout = 5;
 		$('.karaokebunny-current-title').text('Next up: ' + song.title);
-		$('.karaokebunny-current-artist').text('in ' + timeout);
+		$('.karaokebunny-current-artist').text('in  ' + timeout);
 		$('.karaokebunny-current-duration').text('');
 
 		function countdown() {
 			timeout--;
-			$('.karaokebunny-current-artist').text('in ' + timeout);
+			$('.karaokebunny-current-artist').text('in  ' + timeout);
 			if (timeout == 1) {
 				window.location = 'https://www.youtube.com/watch?v=' + song.video_id + '#KaraokeBunny';
 			}
@@ -240,7 +244,13 @@ let KaraokeBunny = {
 		// Create header
 		let header = document.createElement("div");
 		header.className = "karaokebunny-header";
-		header.appendChild(document.createTextNode("Karaoke Bunny"));
+		let headerLogo = document.createElement("div");
+		headerLogo.className = 'karaokebunny-logo';
+		header.appendChild(headerLogo);
+		let headerText = document.createElement("span");
+		headerText.appendChild(document.createTextNode("Karaoke Bunny"));
+		headerText.className = 'karaokebunny-header-text';
+		header.appendChild(headerText);
 		let button = document.createElement("button");
 		//button.appendChild(document.createTextNode("Go Fullscreen"));
 		button.className = 'js-toggle-fullscreen-btn toggle-fullscreen-btn';
@@ -253,7 +263,6 @@ let KaraokeBunny = {
 		
 		$(button).on("click", KaraokeBunny.setFullScreen);
 		header.appendChild(button);
-		$('#masthead').replaceWith(header);
 
 		// Create sidebar for QR code and song queue
 		let sidebar = document.createElement("div");
@@ -270,8 +279,7 @@ let KaraokeBunny = {
 		sidebar.appendChild(qr);
 		let queueDiv = document.createElement("div");
 		queueDiv.className = 'karaokebunny-queue';
-		sidebar.appendChild(queueDiv);		
-		$('#secondary').replaceWith(sidebar);
+		sidebar.appendChild(queueDiv);
 
 		// Create footer for currently playing and up next
 		let footer = document.createElement("div");
@@ -288,11 +296,38 @@ let KaraokeBunny = {
 		footer.appendChild(currentArtist);
 		footer.appendChild(currentDuration);
 		//footer.appendChild(addedByDiv);
-		$('#below').replaceWith(footer);
+
+		let oldBody = $('body');
+		KaraokeBunny.video = $('video').get(0);
+
+		let main = document.createElement("div");
+		main.className = 'karaokebunny-main';
+		let mainInner = document.createElement("div");
+		mainInner.className = 'karaokebunny-main-inner';
+		let videoContainer = document.createElement("div");
+		videoContainer.className = 'karaokebunny-main-video';
+
+		videoContainer.appendChild(document.getElementById('player'));
+		//videoContainer.appendChild(KaraokeBunny.video);
+		mainInner.appendChild(videoContainer);
+		main.appendChild(mainInner);
+		main.appendChild(footer);
+		
+		let newBody = document.createElement("body");
+		newBody.appendChild(header);
+		newBody.appendChild(main);
+		newBody.appendChild(sidebar);
+
+		oldBody.replaceWith(newBody);
+		
+		//$('#masthead').replaceWith(header);
+		//$('#secondary').replaceWith(sidebar);
+		//$('#below').replaceWith(footer);
+		
 
 		
 		// Setup video finish event handler
-		KaraokeBunny.video = $('video').get(0);
+		console.log(KaraokeBunny.video);
 		KaraokeBunny.video.addEventListener('ended', KaraokeBunny.videoEnded);
 		//console.log(video);
 		//console.log($('#ytd-player'));
