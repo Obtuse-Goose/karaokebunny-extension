@@ -200,12 +200,11 @@ let KaraokeBunny = {
 		queueTitle.className = 'karaokebunny-queue-title';
 
 		let upcoming = document.createElement("span");
-		upcoming.className = 'karaokebunny-artist';
-		upcoming.appendChild(document.createTextNode('Upcoming Songs'));
+		upcoming.appendChild(document.createTextNode('Song Queue'));
 		queueTitle.appendChild(upcoming);
 
 		let duration = document.createElement("div");
-		duration.className = 'karaokebunny-duration karaokebunny-total';
+		duration.className = 'karaokebunny-total-duration';
 		duration.dataset.duration = totalDuration;
 		duration.appendChild(document.createTextNode(KaraokeBunny.formatDuration(totalDuration)));
 		queueTitle.appendChild(duration);
@@ -324,10 +323,8 @@ let KaraokeBunny = {
 		//$('#secondary').replaceWith(sidebar);
 		//$('#below').replaceWith(footer);
 		
-
-		
 		// Setup video finish event handler
-		console.log(KaraokeBunny.video);
+		//console.log(KaraokeBunny.video);
 		KaraokeBunny.video.addEventListener('ended', KaraokeBunny.videoEnded);
 		//console.log(video);
 		//console.log($('#ytd-player'));
