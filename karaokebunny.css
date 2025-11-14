@@ -138,7 +138,7 @@ video {
     color: var(--main-color);
     padding-top: 20px;
     padding-left: 10px;
-    width: 30vw;
+    width: 23vw;
     max-width: 700px;
     height: calc(100vh - 216px);
     position: absolute;
