@@ -50,21 +50,30 @@ body {
 
 .karaokebunny-header button {
     position: absolute;
-    top: 10px;
-    right: 24px;
+	z-index: 10000;
+	top: 10px;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	outline: none;
+	background: none;
+}
+
+/* Play and pause buttons */
+.play-button {
+	right: 160px;
+    height: 32px;
+    width: 32px;
+}
+.pause-button {
+	right: 100px;
+    height: 32px;
+    width: 32px;
 }
 
 /* Fullscreen button */
-.toggle-fullscreen-btn {
-	position: absolute;
-	z-index: 10000;
-	top: 10px;
+.toggle-fullscreen-button {
 	right: 10px;
-	border: 0;
-	padding: 0;
-	background: none;
-	cursor: pointer;
-	outline: none;
 }
 
 .fullscreen-image:hover {
@@ -235,6 +244,7 @@ span#karaokebunny-qrcode img {
     height: 132px;
     clear: both;
     width: 100%;
+    padding-left: 10px;
 }
 
 .karaokebunny-current-title {

@@ -99,6 +99,12 @@ let KaraokeBunny = {
 			this.title = 'Enter fullscreen mode';
 		}
 	},
+	playButtonClick: function() {
+		KaraokeBunny.video.play();
+	},
+	pauseButtonClick: function() {
+		KaraokeBunny.video.pause();
+	},
 	refresh: function() {
 		$.ajax({
 			url: 'https://api.karaokebunny.com/queue/' + KaraokeBunny.roomCode, 
@@ -250,18 +256,37 @@ let KaraokeBunny = {
 		headerText.appendChild(document.createTextNode("Karaoke Bunny"));
 		headerText.className = 'karaokebunny-header-text';
 		header.appendChild(headerText);
-		let button = document.createElement("button");
-		//button.appendChild(document.createTextNode("Go Fullscreen"));
-		button.className = 'js-toggle-fullscreen-btn toggle-fullscreen-btn';
-		button.title = 'Enter fullscreen mode';
+		let fullscreenButton = document.createElement("button");
+		fullscreenButton.className = 'toggle-fullscreen-button';
+		fullscreenButton.title = 'Enter fullscreen mode';
 
-		let img = document.createElement("img");
-		img.src = KaraokeBunny.getURL('img/fullscreen.png');
-		img.className = 'fullscreen-image';
-		button.appendChild(img);
+		let fullscreenImage = document.createElement("img");
+		fullscreenImage.src = KaraokeBunny.getURL('img/fullscreen.png');
+		fullscreenImage.className = 'fullscreen-image';
+		fullscreenButton.appendChild(fullscreenImage);
 		
-		$(button).on("click", KaraokeBunny.setFullScreen);
-		header.appendChild(button);
+		$(fullscreenButton).on("click", KaraokeBunny.setFullScreen);
+
+		let playButton = document.createElement("button");
+		playButton.className = 'play-button';
+		playButton.title = 'Play';
+		let playImage = document.createElement("img");
+		playImage.src = KaraokeBunny.getURL('img/play.png');
+		playButton.appendChild(playImage);
+
+		$(playButton).on("click", KaraokeBunny.playButtonClick);
+		let pauseButton = document.createElement("button");
+		pauseButton.className = 'pause-button';
+		pauseButton.title = 'Pause';
+		let pauseImage = document.createElement("img");
+		pauseImage.src = KaraokeBunny.getURL('img/pause.png');
+		pauseButton.appendChild(pauseImage);
+		$(pauseButton).on("click", KaraokeBunny.pauseButtonClick);
+
+
+		header.appendChild(playButton);
+		header.appendChild(pauseButton);
+		header.appendChild(fullscreenButton);
 
 		// Create sidebar for QR code and song queue
 		let sidebar = document.createElement("div");
