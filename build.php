@@ -45,7 +45,21 @@ function zip($files, $manifest, $filename) {
     $zip = new \ZipArchive;
     if ($zip->open($filename, \ZIPARCHIVE::CREATE | \ZipArchive::OVERWRITE)) {
         foreach($files as $file) {
-            $zip->addFile($file, $file);
+            if ($filename == 'Firefox.zip' && preg_match('/mtg-data\.json$/', $file)) {
+                //print($file);
+                $handle = fopen($file, "r");
+                $contents = fread($handle, 4000000);
+                fclose($handle);
+                $end = strrpos($contents, ']', -1) + 1;
+                //print $end . PHP_EOL;
+                $contents = substr($contents, 0, $end) . '}}';
+                //file_put_contents('test.json', $contents);
+                //print($contents . PHP_EOL);
+                $zip->AddFromString($file, $contents);
+            }
+            else {
+                $zip->addFile($file, $file);
+            }
         }
         $zip->AddFromString('manifest.json', $manifest);
         $zip->close();
