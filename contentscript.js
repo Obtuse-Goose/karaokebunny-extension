@@ -262,24 +262,26 @@ let KaraokeBunny = {
 
 		let fullscreenImage = document.createElement("img");
 		fullscreenImage.src = KaraokeBunny.getURL('img/fullscreen.png');
-		fullscreenImage.className = 'fullscreen-image';
+		fullscreenImage.className = 'karaokebunny-button-image';
 		fullscreenButton.appendChild(fullscreenImage);
 		
 		$(fullscreenButton).on("click", KaraokeBunny.setFullScreen);
 
 		let playButton = document.createElement("button");
-		playButton.className = 'play-button';
+		playButton.className = 'karaokebunny-play-button';
 		playButton.title = 'Play';
 		let playImage = document.createElement("img");
 		playImage.src = KaraokeBunny.getURL('img/play.png');
+		playImage.className = 'karaokebunny-button-image';
 		playButton.appendChild(playImage);
 
 		$(playButton).on("click", KaraokeBunny.playButtonClick);
 		let pauseButton = document.createElement("button");
-		pauseButton.className = 'pause-button';
+		pauseButton.className = 'karaokebunny-pause-button';
 		pauseButton.title = 'Pause';
 		let pauseImage = document.createElement("img");
 		pauseImage.src = KaraokeBunny.getURL('img/pause.png');
+		pauseImage.className = 'karaokebunny-button-image';
 		pauseButton.appendChild(pauseImage);
 		$(pauseButton).on("click", KaraokeBunny.pauseButtonClick);
 
@@ -331,8 +333,8 @@ let KaraokeBunny = {
 		let videoContainer = document.createElement("div");
 		videoContainer.className = 'karaokebunny-main-video';
 
-		videoContainer.appendChild(document.getElementById('player'));
-		//videoContainer.appendChild(KaraokeBunny.video);
+		//videoContainer.appendChild(document.getElementById('player'));
+		videoContainer.appendChild(KaraokeBunny.video);
 		mainInner.appendChild(videoContainer);
 		main.appendChild(mainInner);
 		main.appendChild(footer);

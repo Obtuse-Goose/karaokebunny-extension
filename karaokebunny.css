@@ -60,12 +60,12 @@ body {
 }
 
 /* Play and pause buttons */
-.play-button {
+.karaokebunny-play-button {
 	right: 160px;
     height: 32px;
     width: 32px;
 }
-.pause-button {
+.karaokebunny-pause-button {
 	right: 100px;
     height: 32px;
     width: 32px;
@@ -76,12 +76,12 @@ body {
 	right: 10px;
 }
 
-.fullscreen-image:hover {
+.karaokebunny-button-image:hover {
     transform: scale(1.3);
     transition: all 0.3s cubic-bezier(0.65, 0.05, 0.36, 1);
 }
 
-.fullscreen-image {
+.karaokebunny-button-image {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -92,16 +92,6 @@ body {
     left: 0px;
     right: 600px;
     height: calc(100vh - 84px);
-    
-    /*
-    max-height: calc(100vh - 216px);
-
-    max-width: calc(100vw - 600px);
-    object-fit: contain;
-    */
-    /*
-    height: calc(100vh - 216px);
-    width: calc((100vh - 216px) * 16 / 9);*/
 }
 
 .karaokebunny-main-inner {
@@ -110,8 +100,8 @@ body {
 
 .karaokebunny-main-video {
     aspect-ratio: 16 / 9;
-    max-height: 100%;
-    max-width: 100%;
+    height: 100%;
+    width: 100%;
 }
 
 /* Player */
@@ -126,9 +116,12 @@ div.html5-video-container {
     width: 100%;
     height: 100%;
 }
-video {
+video.html5-main-video {
+    position: static;
+
     max-width: 100%;
     max-height: 100%;
+    
     width: 100% !important;
     height: 100% !important;
 }
@@ -138,13 +131,16 @@ video {
     color: var(--main-color);
     padding-top: 20px;
     padding-left: 10px;
-    width: 23vw;
+    /* width: 23vw; */
+    /*width: calc( 100vw - ( ( 100vh - 216px ) * 16 / 9 ) );*/
     max-width: 700px;
-    height: calc(100vh - 216px);
+    height: calc(100vh - 84px);
+    
     position: absolute;
     right: 0px;
     top: 84px;
     z-index: 1;
+    
 }
 
 @media (min-width: 2560px) {
