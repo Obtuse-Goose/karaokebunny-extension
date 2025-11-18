@@ -147,8 +147,13 @@ let KaraokeBunny = {
 			durationDiv.text(KaraokeBunny.formatDuration(total));
 		}
 
-		console.log(queue);
-		if (queue.length == 0) return;
+		//console.log(queue);
+		if (queue.length == 0) {
+			if (document.title == 'Welcome to KaraokeBunny - YouTube') {
+				$('.karaokebunny-current-title').text('Welcome to Karaoke Bunny');
+			}
+			return;
+		}
 		if (JSON.stringify(KaraokeBunny.queue) == JSON.stringify(queue)) {
 			return;
 		}
