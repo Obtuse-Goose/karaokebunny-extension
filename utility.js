@@ -50,6 +50,27 @@ let KaraokeBunnyUtil = {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	},
 
+    getSidebarDiv: function() {
+        // Create sidebar for QR code and song queue
+		let sidebar = document.createElement("div");
+		sidebar.className = "karaokebunny-sidebar";
+		let qr = document.createElement("div");
+		let top = document.createElement("span");
+		let bottom = document.createElement("span");
+		bottom.id = 'karaokebunny-qrcode';
+		qr.className = 'karaokebunny-qr';
+		top.appendChild(document.createTextNode("Scan to add songs to the queue"));
+		qr.appendChild(top);
+		qr.appendChild(document.createElement("br"))
+		qr.appendChild(bottom);
+		sidebar.appendChild(qr);
+		let queueDiv = document.createElement("div");
+		queueDiv.className = 'karaokebunny-queue';
+		sidebar.appendChild(queueDiv);
+
+        return sidebar;
+    },
+
     getSongDiv: function(song) {			
         let link = document.createElement("a");
         link.href = 'https://www.youtube.com/watch?v=' + song.video_id + '#KaraokeBunny';

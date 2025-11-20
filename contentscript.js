@@ -52,13 +52,15 @@ let KaraokeBunny = {
 			$(".karaokebunny-main").removeClass('karaokebunny-popped');
 			KaraokeBunny.popped = false;
 			this.title = 'Popout Song Queue';
+			$(".karaokebunny-button-popout").attr('src', KaraokeBunnyUtil.getURL('img/popout.png'));
 		}
 		else {
-			KaraokeBunnyUtil.sendMessage({name: "pop", width: Math.round(screen.width)});
+			KaraokeBunnyUtil.sendMessage({name: "pop", width: Math.round(screen.width), roomCode: KaraokeBunny.roomCode, queue: KaraokeBunny.queue, currentPosition: KaraokeBunny.currentPosition});
 			$(".karaokebunny-sidebar").hide();
 			$(".karaokebunny-main").addClass('karaokebunny-popped');
 			KaraokeBunny.popped = true;
 			this.title = 'Unpop Song Queue';
+			$(".karaokebunny-button-popout").attr('src', KaraokeBunnyUtil.getURL('img/unpop.png'));
 		}
 	},
 	setFullScreen: function() {
@@ -96,15 +98,7 @@ let KaraokeBunny = {
 			}
 			return;
 		}
-		if (KaraokeBunny.popped) {
-			KaraokeBunnyUtil.sendMessage({name: "loadQueue", queue: KaraokeBunny.queue});
-		}
 
-		if (JSON.stringify(KaraokeBunny.queue) == JSON.stringify(queue)) {
-			return;
-		}
-
-		KaraokeBunny.queue = queue;
 		KaraokeBunny.currentPosition = 0;
 		let pastSongs = '';
 		for (let i=0; i<queue.length; i++) {
@@ -115,6 +109,14 @@ let KaraokeBunny = {
 			if (KaraokeBunny.currentPosition === 0) {
 				pastSongs += song.song_id + ',';
 			}
+		}
+
+		if (KaraokeBunny.popped) {
+			KaraokeBunnyUtil.sendMessage({name: "loadQueue", roomCode: KaraokeBunny.roomCode, queue: KaraokeBunny.queue, currentPosition: KaraokeBunny.currentPosition});
+		}
+
+		if (JSON.stringify(KaraokeBunny.queue) == JSON.stringify(queue)) {
+			return;
 		}
 
 		// If the current song isn't in the queue at all, redirect to the first song.
@@ -130,6 +132,8 @@ let KaraokeBunny = {
 				crossDomain: true
 			});
 		}
+
+		KaraokeBunny.queue = queue;
 
 		if (!KaraokeBunny.popped) {
 			$('.karaokebunny-queue').replaceWith(KaraokeBunnyUtil.getQueueDiv(KaraokeBunny.queue, KaraokeBunny.currentPosition));
@@ -195,7 +199,7 @@ let KaraokeBunny = {
 		popoutButton.title = 'Popout Song Queue';
 		let popoutImage = document.createElement("img");
 		popoutImage.src = KaraokeBunnyUtil.getURL('img/popout.png');
-		popoutImage.className = 'karaokebunny-button-image';
+		popoutImage.className = 'karaokebunny-button-image karaokebunny-button-popout';
 		popoutButton.appendChild(popoutImage);
 		$(popoutButton).on("click", KaraokeBunny.popoutClick);
 
@@ -215,22 +219,7 @@ let KaraokeBunny = {
 		header.appendChild(popoutButton);
 		header.appendChild(fullscreenButton);
 
-		// Create sidebar for QR code and song queue
-		let sidebar = document.createElement("div");
-		sidebar.className = "karaokebunny-sidebar";
-		let qr = document.createElement("div");
-		let top = document.createElement("span");
-		let bottom = document.createElement("span");
-		bottom.id = 'karaokebunny-qrcode';
-		qr.className = 'karaokebunny-qr';
-		top.appendChild(document.createTextNode("Scan to add songs to the queue"));
-		qr.appendChild(top);
-		qr.appendChild(document.createElement("br"))
-		qr.appendChild(bottom);
-		sidebar.appendChild(qr);
-		let queueDiv = document.createElement("div");
-		queueDiv.className = 'karaokebunny-queue';
-		sidebar.appendChild(queueDiv);
+		let sidebar = KaraokeBunnyUtil.getSidebarDiv();
 
 		// Create footer for currently playing and up next
 		let footer = document.createElement("div");

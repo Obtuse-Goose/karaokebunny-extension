@@ -21,6 +21,7 @@ function onRequest(request, sender, sendResponse) {
 		});
 	}
 	else if (request.name == "pop") {
+		KaraokeBunny.lastMessage = request;
 		browser.windows.create({
 			url: getURL('queue.html'),
 			type: 'popup',
@@ -33,17 +34,15 @@ function onRequest(request, sender, sendResponse) {
 	else if (request.name == "unpop") {
 		try {
 			chrome.windows.remove(KaraokeBunny.popupWindow.id);
+			delete KaraokeBunny.popupWindow;
 		}
 		catch {
 			// Errors if the window has already been closed.
 		}
 	}
 	else if (request.name == "loadQueue") {
-		console.log(request.queue);
-		//KaraokeBunny.popupWindow.postMessage(request);
 		if (KaraokeBunny.popupWindow && KaraokeBunny.popupWindow.tabs.length == 1) {
-			chrome.tabs.sendMessage({
-				tabId: KaraokeBunny.popupWindow.tabs[0].id,
+			KaraokeBunny.port.postMessage({
 				message: request
 			});
 		}
@@ -52,13 +51,25 @@ function onRequest(request, sender, sendResponse) {
 	return true;
 };
 
+function onConnect(port) {
+	if (port.name != 'karaokebunny') return;
+	KaraokeBunny.port = port;
+	port.postMessage({
+		message: KaraokeBunny.lastMessage
+	});
+
+	//port.onMessage.addListener(onMessage);
+	//port.onDisconnect.addListener(deleteTimer);
+	//port._timer = setTimeout(forceReconnect, 250e3, port);
+
+	return true;
+}
+
 
 // Listen for the content script to send a message to the background page.
-// Chrome, Opera, Firefox or Edge
-// Simple messages
 browser.runtime.onMessage.addListener(onRequest);
-// Persistent connections
-//browser.runtime.onConnect.addListener(onConnect);
+// Setup a persistent connection so we can send messages to the popout song queue.
+browser.runtime.onConnect.addListener(onConnect);
 
 // On first install launch the video page
 browser.runtime.onInstalled.addListener((details) => {

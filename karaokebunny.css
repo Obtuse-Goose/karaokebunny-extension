@@ -150,6 +150,21 @@ video.html5-main-video {
     top: 84px;
 }
 
+/* When the sidebar is popped-out, it should occupy the whole of the popup window */
+.karaokebunny-popped .karaokebunny-sidebar {
+    height: 100vh;
+    width: 98vw;
+    max-width: 100vw;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    padding: 0px;
+}
+
+.karaokebunny-popped .karaokebunny-queue-inner {
+    height: calc(100vh - 336px);
+}
+
 @media (min-width: 2560px) {
     .karaokebunny-sidebar {
         font-size: 36pt;
@@ -190,7 +205,7 @@ span#karaokebunny-qrcode img {
     overflow-y: scroll;
     scrollbar-color: var(--main-color) #1f1f1f;
     scrollbar-width: thin;
-    height: calc(100vh - 440px);
+    height: calc(100vh - 450px);
 }
 
 .karaokebunny-queue-title {
