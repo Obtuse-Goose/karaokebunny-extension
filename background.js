@@ -32,13 +32,15 @@ function onRequest(request, sender, sendResponse) {
 		});
 	}
 	else if (request.name == "unpop") {
-		try {
-			chrome.windows.remove(KaraokeBunny.popupWindow.id);
-			delete KaraokeBunny.popupWindow;
-		}
-		catch {
-			// Errors if the window has already been closed.
-		}
+		// Check the window still exists before closing it
+		browser.windows.getAll().then((windows) => {
+			for (let i=0; i<windows.length; i++) {
+				if (windows[i].id == KaraokeBunny.popupWindow.id) {
+					browser.windows.remove(KaraokeBunny.popupWindow.id);
+					delete KaraokeBunny.popupWindow;
+				}
+			}
+		});
 	}
 	else if (request.name == "loadQueue") {
 		if (KaraokeBunny.popupWindow && KaraokeBunny.popupWindow.tabs.length == 1) {
