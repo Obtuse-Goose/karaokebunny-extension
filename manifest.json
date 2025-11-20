@@ -1,7 +1,8 @@
 {
     "version": "0.5.0",
     "permissions": [
-        "storage"
+        "storage",
+        "windows"
     ],
     "host_permissions": [
         "https:\/\/*.youtube.com\/*",
@@ -48,6 +49,7 @@
             "js": [
                 "libs\/jquery-3.6.0.min.js",
                 "libs\/qrcode.min.js",
+                "utility.js",
                 "contentscript.js"
             ],
             "matches": [

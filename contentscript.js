@@ -3,56 +3,7 @@ if (typeof chrome !== 'undefined') {var browser = chrome;}
 let KaraokeBunny = {
 	loaded: false,
 	videoEnded: false,
-	apiUrl: 'https://api.karaokebunny.com/',
-	isDevMode: function() {
-		return !('update_url' in browser.runtime.getManifest());
-	},
-	sendMessage(message) {
-		return new Promise((resolve, reject) => {
-			browser.runtime.sendMessage(message, response => resolve(response));
-		});
-	},
-	ajax: function(url) {
-		return new Promise((resolve, reject) => {
-			KaraokeBunny.sendMessage({'name': 'getFile', 'url': url}).then((response) => {
-				resolve(response.data);
-			});
-		});
-	},
-	getURL: function(filename) {
-		return browser.runtime.getURL(filename);
-	},
-	apiRequest: function(route) {
-		return new Promise((resolve, reject) => {
-			KaraokeBunny.sendMessage({'name': 'getFile', 'url': KaraokeBunny.apiUrl + route}).then((response) => {
-				if (!response) {
-					console.log('Error getting ' + KaraokeBunny.apiUrl + route);
-					return;
-				}
-				resolve(JSON.parse(response.data));
-			});
-		});
-	},
-	injectCSSFile: function(url) {
-		let link = document.createElement("link");
-		link.href = url;
-		link.type = "text/css";
-		link.rel = "stylesheet";
-		document.getElementsByTagName("head")[0].appendChild(link);
-	},
-	formatDuration: function(duration) {
-		if (!duration) return '';
-		let hours = Math.floor(duration / 3600);
-		let minutes = Math.floor(duration / 60);
-		let seconds = duration % 60;
-		if (hours > 0 && minutes.toString().length == 1) minutes = '0' + minutes;
-		if (minutes > 0 && seconds.toString().length == 1) seconds = '0' + seconds;
-		
-		return (hours > 0 ? hours + ':' : '') + (minutes > 0 ? minutes + ':' : '') + seconds;
-	},
-	sleep: function(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	},
+	popped: false,
 	nextSong: function(song) {
 		let timeout = 5;
 		$('.karaokebunny-current-title').text('Next up: ' + song.title);
@@ -88,22 +39,38 @@ let KaraokeBunny = {
 			$('.karaokebunny-current-duration').text('');
 		}
 	},
+	playButtonClick: function() {
+		KaraokeBunny.video.play();
+	},
+	pauseButtonClick: function() {
+		KaraokeBunny.video.pause();
+	},
+	popoutClick: function() {
+		if (KaraokeBunny.popped) {
+			KaraokeBunnyUtil.sendMessage({name: "unpop"});
+			$(".karaokebunny-sidebar").fadeIn('slow');
+			$(".karaokebunny-main").removeClass('karaokebunny-popped');
+			KaraokeBunny.popped = false;
+			this.title = 'Popout Song Queue';
+		}
+		else {
+			KaraokeBunnyUtil.sendMessage({name: "pop", width: Math.round(screen.width)});
+			$(".karaokebunny-sidebar").hide();
+			$(".karaokebunny-main").addClass('karaokebunny-popped');
+			KaraokeBunny.popped = true;
+			this.title = 'Unpop Song Queue';
+		}
+	},
 	setFullScreen: function() {
 		if (!document.fullscreenElement) {
 			document.body.requestFullscreen();
-			document.body.setAttribute("fullscreen","");
+			document.body.setAttribute("fullscreen"," ");
 			this.title = 'Leave fullscreen mode';
 		} else {
 			document.exitFullscreen();
 			document.body.removeAttribute("fullscreen");
 			this.title = 'Enter fullscreen mode';
 		}
-	},
-	playButtonClick: function() {
-		KaraokeBunny.video.play();
-	},
-	pauseButtonClick: function() {
-		KaraokeBunny.video.pause();
 	},
 	refresh: function() {
 		$.ajax({
@@ -116,35 +83,10 @@ let KaraokeBunny = {
 		});
 	},
 	loadQueue: function(queue) {
-		function getSongDiv(song) {			
-			let link = document.createElement("a");
-			link.href = 'https://www.youtube.com/watch?v=' + song.video_id + '#KaraokeBunny';
-
-			let title = document.createElement("div");
-			title.className = 'karaokebunny-title';
-			title.appendChild(document.createTextNode(song.title));
-			link.appendChild(title);
-
-			let artist = document.createElement("span");
-			artist.className = 'karaokebunny-artist';
-			artist.appendChild(document.createTextNode(song.artist));
-			link.appendChild(artist);
-
-			let duration = document.createElement("div");
-			duration.className = 'karaokebunny-duration';
-			duration.appendChild(document.createTextNode(KaraokeBunny.formatDuration(song.duration)));
-			link.appendChild(duration);
-
-			let result = document.createElement("div");
-			result.className = 'karaokebunny-song';
-			result.appendChild(link);
-			return result;
-		}
-
 		let durationDiv = $('.karaokebunny-total');
 		if (durationDiv.length == 1) {
 			let total = Math.round(parseInt(durationDiv[0].dataset.duration) - KaraokeBunny.video.currentTime);
-			durationDiv.text(KaraokeBunny.formatDuration(total));
+			durationDiv.text(KaraokeBunnyUtil.formatDuration(total));
 		}
 
 		//console.log(queue);
@@ -154,6 +96,10 @@ let KaraokeBunny = {
 			}
 			return;
 		}
+		if (KaraokeBunny.popped) {
+			KaraokeBunnyUtil.sendMessage({name: "loadQueue", queue: KaraokeBunny.queue});
+		}
+
 		if (JSON.stringify(KaraokeBunny.queue) == JSON.stringify(queue)) {
 			return;
 		}
@@ -184,48 +130,12 @@ let KaraokeBunny = {
 				crossDomain: true
 			});
 		}
-		
-		let queueDivInner = document.createElement("div");
-		queueDivInner.className = 'karaokebunny-queue-inner';
 
-		let totalDuration = 0;
-		for (let i=0; i<queue.length; i++) {
-			let song = queue[i];
-			totalDuration += song.duration;
-			
-			if (song.position == KaraokeBunny.currentPosition) { // Current song
-				$('.karaokebunny-current-title').text(song.title);
-				$('.karaokebunny-current-artist').text(song.artist);
-				$('.karaokebunny-current-duration').text(KaraokeBunny.formatDuration(song.duration));
-				//$('.karaokebunny-added-by').text('Added by ' + song.added_by);
-			}
-			//else if (song.position == KaraokeBunny.currentPosition+1) { // Next song
-				//$('.karaokebunny-next').text('Next: ' + song.artist + ' — ' + song.title);
-			//}
-			else if (song.position > KaraokeBunny.currentPosition) {
-				queueDivInner.appendChild(getSongDiv(song));
-			}
+		if (!KaraokeBunny.popped) {
+			$('.karaokebunny-queue').replaceWith(KaraokeBunnyUtil.getQueueDiv(KaraokeBunny.queue, KaraokeBunny.currentPosition));
 		}
-
-		let queueTitle = document.createElement("div");
-		queueTitle.className = 'karaokebunny-queue-title';
-
-		let upcoming = document.createElement("span");
-		upcoming.appendChild(document.createTextNode('Song Queue'));
-		queueTitle.appendChild(upcoming);
-
-		let duration = document.createElement("div");
-		duration.className = 'karaokebunny-total-duration';
-		duration.dataset.duration = totalDuration;
-		duration.appendChild(document.createTextNode(KaraokeBunny.formatDuration(totalDuration)));
-		queueTitle.appendChild(duration);
-
-		let queueDiv = document.createElement("div");
-		queueDiv.className = 'karaokebunny-queue';
-		queueDiv.appendChild(queueTitle);
-		queueDiv.appendChild(queueDivInner);
-
-		$('.karaokebunny-queue').replaceWith(queueDiv);
+		
+		$('body').fadeIn("slow");
 	},
 	initialise: async function() {
 		let params = new URLSearchParams(document.location.search);
@@ -235,19 +145,19 @@ let KaraokeBunny = {
 
 		while (body === null || body.length == 0) {
 			body = $('body');
-			await KaraokeBunny.sleep(10);
+			await KaraokeBunnyUtil.sleep(10);
 		}
 		body.hide();
 
 		console.log('KaraokeBunny running');
-		KaraokeBunny.injectCSSFile(KaraokeBunny.getURL("karaokebunny.css"));
-		KaraokeBunny.injectCSSFile("https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap");
+		KaraokeBunnyUtil.injectCSSFile(KaraokeBunnyUtil.getURL("karaokebunny.css"));
+		KaraokeBunnyUtil.injectCSSFile("https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap");
 
 		let player = null;
 
 		while (player === null) {
 			player = document.querySelector('#ytd-player');
-			await KaraokeBunny.sleep(10);
+			await KaraokeBunnyUtil.sleep(10);
 		}
 
 		// Replace the non video elements with our own queue and track display
@@ -261,22 +171,12 @@ let KaraokeBunny = {
 		headerText.appendChild(document.createTextNode("Karaoke Bunny"));
 		headerText.className = 'karaokebunny-header-text';
 		header.appendChild(headerText);
-		let fullscreenButton = document.createElement("button");
-		fullscreenButton.className = 'toggle-fullscreen-button';
-		fullscreenButton.title = 'Enter fullscreen mode';
-
-		let fullscreenImage = document.createElement("img");
-		fullscreenImage.src = KaraokeBunny.getURL('img/fullscreen.png');
-		fullscreenImage.className = 'karaokebunny-button-image';
-		fullscreenButton.appendChild(fullscreenImage);
-		
-		$(fullscreenButton).on("click", KaraokeBunny.setFullScreen);
 
 		let playButton = document.createElement("button");
 		playButton.className = 'karaokebunny-play-button';
 		playButton.title = 'Play';
 		let playImage = document.createElement("img");
-		playImage.src = KaraokeBunny.getURL('img/play.png');
+		playImage.src = KaraokeBunnyUtil.getURL('img/play.png');
 		playImage.className = 'karaokebunny-button-image';
 		playButton.appendChild(playImage);
 
@@ -285,14 +185,34 @@ let KaraokeBunny = {
 		pauseButton.className = 'karaokebunny-pause-button';
 		pauseButton.title = 'Pause';
 		let pauseImage = document.createElement("img");
-		pauseImage.src = KaraokeBunny.getURL('img/pause.png');
+		pauseImage.src = KaraokeBunnyUtil.getURL('img/pause.png');
 		pauseImage.className = 'karaokebunny-button-image';
 		pauseButton.appendChild(pauseImage);
 		$(pauseButton).on("click", KaraokeBunny.pauseButtonClick);
 
+		let popoutButton = document.createElement("button");
+		popoutButton.className = 'karaokebunny-popout-button';
+		popoutButton.title = 'Popout Song Queue';
+		let popoutImage = document.createElement("img");
+		popoutImage.src = KaraokeBunnyUtil.getURL('img/popout.png');
+		popoutImage.className = 'karaokebunny-button-image';
+		popoutButton.appendChild(popoutImage);
+		$(popoutButton).on("click", KaraokeBunny.popoutClick);
+
+		let fullscreenButton = document.createElement("button");
+		fullscreenButton.className = 'karaokebunny-fullscreen-button';
+		fullscreenButton.title = 'Enter fullscreen mode';
+		let fullscreenImage = document.createElement("img");
+		fullscreenImage.src = KaraokeBunnyUtil.getURL('img/fullscreen.png');
+		fullscreenImage.className = 'karaokebunny-button-image';
+		fullscreenButton.appendChild(fullscreenImage);
+		
+		$(fullscreenButton).on("click", KaraokeBunny.setFullScreen);
+		
 
 		header.appendChild(playButton);
 		header.appendChild(pauseButton);
+		header.appendChild(popoutButton);
 		header.appendChild(fullscreenButton);
 
 		// Create sidebar for QR code and song queue
@@ -348,12 +268,12 @@ let KaraokeBunny = {
 		newBody.appendChild(header);
 		newBody.appendChild(main);
 		newBody.appendChild(sidebar);
-
-		oldBody.replaceWith(newBody);
 		
 		//$('#masthead').replaceWith(header);
 		//$('#secondary').replaceWith(sidebar);
 		//$('#below').replaceWith(footer);
+		$(newBody).hide();
+		oldBody.replaceWith(newBody);
 		
 		// Setup video finish event handler
 		//console.log(KaraokeBunny.video);
@@ -361,15 +281,13 @@ let KaraokeBunny = {
 		//console.log(video);
 		//console.log($('#ytd-player'));
 
-		if (KaraokeBunny.isDevMode()) {
+		if (KaraokeBunnyUtil.isDevMode()) {
 			console.log('dev mode');
 			KaraokeBunny.video.pause();
 		}
 		else {
 			KaraokeBunny.video.play();
 		}
-		
-		$('body').show("slow");
 		
 		// Get the room code from local storage
 		browser.storage.local.get(['roomCode'], async function(data) {
@@ -378,16 +296,15 @@ let KaraokeBunny = {
 			}
 			else {
 				// No roomCode found - ask the server to generate a unique one and then store it.
-				let response = await KaraokeBunny.apiRequest('room');
+				let response = await KaraokeBunnyUtil.apiRequest('room');
 				KaraokeBunny.roomCode = response['room_code'];
 				browser.storage.local.set({
 					roomCode: KaraokeBunny.roomCode
 				});
 			}
 			
-			new QRCode(document.getElementById("karaokebunny-qrcode"), "https://app.karaokebunny.com/#Search/" + KaraokeBunny.roomCode);
-
 			console.log('Room code: ' + KaraokeBunny.roomCode);
+			new QRCode(document.getElementById("karaokebunny-qrcode"), "https://app.karaokebunny.com/#Search/" + KaraokeBunny.roomCode);
 
 			let promoDiv = $('div.promo-title');
 			if (promoDiv.text() == "This video isn\'t available anymore") {
@@ -402,7 +319,7 @@ let KaraokeBunny = {
 				});
 			}
 			else {
-				KaraokeBunny.apiRequest('queue/' + KaraokeBunny.roomCode).then((response) => {
+				KaraokeBunnyUtil.apiRequest('queue/' + KaraokeBunny.roomCode).then((response) => {
 					KaraokeBunny.loadQueue(response);
 				});
 			}
