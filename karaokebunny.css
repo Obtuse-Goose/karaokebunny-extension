@@ -70,14 +70,15 @@ body {
     height: 32px;
     width: 32px;
 }
-.karaokebunny-popout-button {
+
+/* Fullscreen button */
+.karaokebunny-fullscreen-button {
 	right: 100px;
     height: 32px;
     width: 32px;
 }
-
-/* Fullscreen button */
-.karaokebunny-fullscreen-button {
+/* Popout button */
+.karaokebunny-popout-button {
 	right: 10px;
 }
 

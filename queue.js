@@ -2,16 +2,16 @@ if (typeof chrome !== 'undefined') {var browser = chrome;}
 
 let KaraokeBunny = {
     connect: function() {
-        persistentPort = browser.runtime.connect({name: 'karaokebunny'});
-        persistentPort.onDisconnect.addListener(KaraokeBunny.connect);
+        KaraokeBunny.backgroundPort = browser.runtime.connect({name: 'karaokebunny-queue-popup'});
+        KaraokeBunny.backgroundPort.onDisconnect.addListener(KaraokeBunny.connect);
         
-        persistentPort.onMessage.addListener(msg => {
+        KaraokeBunny.backgroundPort.onMessage.addListener(msg => {
             KaraokeBunny.loadQueue(msg.message.roomCode, msg.message.queue, msg.message.currentPosition);
         });
     },
 
     loadQueue: function(roomCode, queue, currentPosition) {
-        console.log(queue);
+        //console.log(queue);
         if (JSON.stringify(KaraokeBunny.queue) == JSON.stringify(queue)) {
             return;
         }
@@ -23,6 +23,10 @@ let KaraokeBunny = {
         $('.karaokebunny-queue').replaceWith(KaraokeBunnyUtil.getQueueDiv(queue, currentPosition));
 
         KaraokeBunny.queue = queue;
+    },
+
+    unpopClick: function() {
+       window.close();
     }
 
 };
@@ -30,7 +34,23 @@ let KaraokeBunny = {
 $(document).ready(function() {
     let newBody = document.createElement("body");
     newBody.className = 'karaokebunny-popped';
+
+    let popoutButton = document.createElement("button");
+    popoutButton.className = 'karaokebunny-popout-button';
+    popoutButton.title = 'Unpop Song Queue';
+    let popoutImage = document.createElement("img");
+    popoutImage.src = KaraokeBunnyUtil.getURL('img/unpop.png');
+    popoutImage.className = 'karaokebunny-button-image karaokebunny-button-popout';
+    popoutButton.appendChild(popoutImage);
+    $(popoutButton).on("click", KaraokeBunny.unpopClick);
+
+    let header = document.createElement("div");
+    header.className = "karaokebunny-header";
+
+    header.appendChild(popoutButton);
+    newBody.appendChild(header);
     newBody.appendChild(KaraokeBunnyUtil.getSidebarDiv());
+
     $('body').replaceWith(newBody);
 
     KaraokeBunny.connect();

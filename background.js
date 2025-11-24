@@ -44,7 +44,7 @@ function onRequest(request, sender, sendResponse) {
 	}
 	else if (request.name == "loadQueue") {
 		if (KaraokeBunny.popupWindow && KaraokeBunny.popupWindow.tabs.length == 1) {
-			KaraokeBunny.port.postMessage({
+			KaraokeBunny.queuePopupPort.postMessage({
 				message: request
 			});
 		}
@@ -53,14 +53,22 @@ function onRequest(request, sender, sendResponse) {
 	return true;
 };
 
-function onConnect(port) {
-	if (port.name != 'karaokebunny') return;
-	KaraokeBunny.port = port;
-	port.postMessage({
-		message: KaraokeBunny.lastMessage
-	});
 
-	//port.onMessage.addListener(onMessage);
+function onConnect(port) {
+	if (port.name == 'karaokebunny-queue-popup') {
+		console.log(KaraokeBunny.lastMessage);
+		KaraokeBunny.queuePopupPort = port;
+		KaraokeBunny.queuePopupPort.postMessage({
+			message: KaraokeBunny.lastMessage
+		});
+		return true;
+	}
+	if (port.name == 'karaokebunny-content-script') {
+		KaraokeBunny.contenScriptPort = port;
+		return true;
+	}
+
+	//port.onMessage.addListener(onPortMessage);
 	//port.onDisconnect.addListener(deleteTimer);
 	//port._timer = setTimeout(forceReconnect, 250e3, port);
 
@@ -79,3 +87,16 @@ browser.runtime.onInstalled.addListener((details) => {
 		browser.tabs.create({'url': "https://karaokebunny.com/launch/"});
 	}
 });
+
+// When the popup window closes, because the user clicked either the x or the unpop button, hide the song queue in the main window. 
+browser.windows.onRemoved.addListener(
+	function(windowId) {
+		if (KaraokeBunny.popupWindow && (KaraokeBunny.popupWindow.id == windowId)) {
+			KaraokeBunny.contenScriptPort.postMessage({
+				message: {
+					name: 'unpop'
+				}
+			});
+		}
+	}
+);

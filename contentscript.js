@@ -4,6 +4,23 @@ let KaraokeBunny = {
 	loaded: false,
 	videoEnded: false,
 	popped: false,
+	connect: function() {
+        KaraokeBunny.backgroundPort = browser.runtime.connect({name: 'karaokebunny-content-script'});
+        KaraokeBunny.backgroundPort.onDisconnect.addListener(KaraokeBunny.connect);
+        
+        KaraokeBunny.backgroundPort.onMessage.addListener(msg => {
+			if (msg.message.name == 'unpop') {
+				KaraokeBunny.showSongQueue();
+			}
+        });
+    },
+	showSongQueue: function() {
+		$(".karaokebunny-sidebar").fadeIn('slow');
+		$(".karaokebunny-main").removeClass('karaokebunny-popped');
+		KaraokeBunny.popped = false;
+		this.title = 'Popout Song Queue';
+		$(".karaokebunny-button-popout").attr('src', KaraokeBunnyUtil.getURL('img/popout.png'));
+	},
 	nextSong: function(song) {
 		let timeout = 5;
 		$('.karaokebunny-current-title').text('Next up: ' + song.title);
@@ -48,11 +65,7 @@ let KaraokeBunny = {
 	popoutClick: function() {
 		if (KaraokeBunny.popped) {
 			KaraokeBunnyUtil.sendMessage({name: "unpop"});
-			$(".karaokebunny-sidebar").fadeIn('slow');
-			$(".karaokebunny-main").removeClass('karaokebunny-popped');
-			KaraokeBunny.popped = false;
-			this.title = 'Popout Song Queue';
-			$(".karaokebunny-button-popout").attr('src', KaraokeBunnyUtil.getURL('img/popout.png'));
+			KaraokeBunny.showSongQueue();
 		}
 		else {
 			KaraokeBunnyUtil.sendMessage({name: "pop", width: Math.round(screen.width), roomCode: KaraokeBunny.roomCode, queue: KaraokeBunny.queue, currentPosition: KaraokeBunny.currentPosition});
@@ -194,15 +207,6 @@ let KaraokeBunny = {
 		pauseButton.appendChild(pauseImage);
 		$(pauseButton).on("click", KaraokeBunny.pauseButtonClick);
 
-		let popoutButton = document.createElement("button");
-		popoutButton.className = 'karaokebunny-popout-button';
-		popoutButton.title = 'Popout Song Queue';
-		let popoutImage = document.createElement("img");
-		popoutImage.src = KaraokeBunnyUtil.getURL('img/popout.png');
-		popoutImage.className = 'karaokebunny-button-image karaokebunny-button-popout';
-		popoutButton.appendChild(popoutImage);
-		$(popoutButton).on("click", KaraokeBunny.popoutClick);
-
 		let fullscreenButton = document.createElement("button");
 		fullscreenButton.className = 'karaokebunny-fullscreen-button';
 		fullscreenButton.title = 'Enter fullscreen mode';
@@ -212,12 +216,21 @@ let KaraokeBunny = {
 		fullscreenButton.appendChild(fullscreenImage);
 		
 		$(fullscreenButton).on("click", KaraokeBunny.setFullScreen);
+
+		let popoutButton = document.createElement("button");
+		popoutButton.className = 'karaokebunny-popout-button';
+		popoutButton.title = 'Popout Song Queue';
+		let popoutImage = document.createElement("img");
+		popoutImage.src = KaraokeBunnyUtil.getURL('img/popout.png');
+		popoutImage.className = 'karaokebunny-button-image karaokebunny-button-popout';
+		popoutButton.appendChild(popoutImage);
+		$(popoutButton).on("click", KaraokeBunny.popoutClick);
 		
 
 		header.appendChild(playButton);
 		header.appendChild(pauseButton);
-		header.appendChild(popoutButton);
 		header.appendChild(fullscreenButton);
+		header.appendChild(popoutButton);
 
 		let sidebar = KaraokeBunnyUtil.getSidebarDiv();
 
@@ -315,6 +328,7 @@ let KaraokeBunny = {
 
 
 			KaraokeBunny.timer = setInterval(KaraokeBunny.refresh, 5000);
+			KaraokeBunny.connect();
 			KaraokeBunny.loaded = true;
 		});
 	}
