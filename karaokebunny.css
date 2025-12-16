@@ -61,14 +61,77 @@ body {
 
 /* Play and pause buttons */
 .karaokebunny-play-button {
-	right: 220px;
+	right: 280px;
     height: 32px;
     width: 32px;
 }
 .karaokebunny-pause-button {
-	right: 160px;
+	right: 220px;
     height: 32px;
     width: 32px;
+}
+
+/* Parental control toggle */
+.karaokebunny-parental-control-switch {
+    position: absolute;
+    display: inline-block;
+	z-index: 10000;
+	top: 25px;
+	right: 130px;
+    width: 60px;
+    height: 34px;
+}
+
+.karaokebunny-parental-control-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.karaokebunny-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.karaokebunny-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .karaokebunny-slider {
+    background-color: var(--main-color);
+}
+
+input:focus + .karaokebunny-slider {
+    box-shadow: 0 0 1px var(--main-color);
+}
+
+input:checked + .karaokebunny-slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.karaokebunny-slider.karaokebunny-round {
+    border-radius: 34px;
+}
+
+.karaokebunny-slider.karaokebunny-round:before {
+    border-radius: 50%;
 }
 
 /* Fullscreen button */

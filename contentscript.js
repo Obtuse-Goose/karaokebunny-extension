@@ -76,6 +76,26 @@ let KaraokeBunny = {
 			$(".karaokebunny-button-popout").attr('src', KaraokeBunnyUtil.getURL('img/unpop.png'));
 		}
 	},
+	toggleParentalControl: function(event) {
+		let parentalControlSwitch = $('.karaokebunny-parental-control-switch');
+		
+		if (event.target.checked) {
+			parentalControlSwitch.prop('title', 'Explicit songs are not allowed');
+			$.ajax({
+				url: 'https://api.karaokebunny.com/room/parental_control/' + KaraokeBunny.roomCode, 
+				method: 'POST',
+				crossDomain: true
+			});
+		}
+		else {
+			parentalControlSwitch.prop('title', 'Explicit songs are allowed');
+			$.ajax({
+				url: 'https://api.karaokebunny.com/room/parental_control/' + KaraokeBunny.roomCode, 
+				method: 'DELETE',
+				crossDomain: true
+			});
+		}
+	},
 	setFullScreen: function() {
 		if (!document.fullscreenElement) {
 			document.body.requestFullscreen();
@@ -207,6 +227,19 @@ let KaraokeBunny = {
 		pauseButton.appendChild(pauseImage);
 		$(pauseButton).on("click", KaraokeBunny.pauseButtonClick);
 
+		let parentalControlToggle = document.createElement("label");
+		parentalControlToggle.className = 'karaokebunny-parental-control-switch';
+		parentalControlToggle.title = 'Explicit songs are allowed';
+		let parentalControlCheckbox = document.createElement("input");
+		parentalControlCheckbox.className = 'karaokebunny-parental-control-checkbox';
+		parentalControlCheckbox.type = 'checkbox';
+		let parentalControlSlider = document.createElement("span");
+		parentalControlSlider.className = 'karaokebunny-slider karaokebunny-round';
+		parentalControlToggle.appendChild(parentalControlCheckbox);
+		parentalControlToggle.appendChild(parentalControlSlider);
+
+		$(parentalControlCheckbox).on("change", KaraokeBunny.toggleParentalControl);
+
 		let fullscreenButton = document.createElement("button");
 		fullscreenButton.className = 'karaokebunny-fullscreen-button';
 		fullscreenButton.title = 'Enter fullscreen mode';
@@ -229,6 +262,7 @@ let KaraokeBunny = {
 
 		header.appendChild(playButton);
 		header.appendChild(pauseButton);
+		header.appendChild(parentalControlToggle);
 		header.appendChild(fullscreenButton);
 		header.appendChild(popoutButton);
 
@@ -325,8 +359,21 @@ let KaraokeBunny = {
 					KaraokeBunny.loadQueue(response);
 				});
 			}
-
-
+			
+			// Read whether parental control mode is on or off to set initial state of toggle
+			$.ajax({
+				url: 'https://api.karaokebunny.com/room/parental_control/' + KaraokeBunny.roomCode, 
+				method: 'GET',
+				crossDomain: true,
+				success: function(response) {
+					if (JSON.parse(response).parental_control) {
+						let parentalControlCheckbox = $('.karaokebunny-parental-control-checkbox');
+						parentalControlCheckbox.prop('checked', true);
+						let parentalControlSwitch = $('.karaokebunny-parental-control-switch');
+						parentalControlSwitch.prop('title', 'Explicit songs are not allowed');
+					}
+				}
+			});
 			KaraokeBunny.timer = setInterval(KaraokeBunny.refresh, 5000);
 			KaraokeBunny.connect();
 			KaraokeBunny.loaded = true;
