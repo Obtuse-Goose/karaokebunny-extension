@@ -367,3 +367,12 @@ span#karaokebunny-qrcode img {
 .karaokebunny-no-close .ui-dialog-titlebar-close {
   display: none;
 }
+
+.karaokebunny-dialog-font.ui-dialog {
+    font-family: 'Cal Sans';
+    font-size: 16px;
+}
+
+.karaokebunny-dialog-font.ui-dialog .ui-dialog-title {
+    font-weight: 400;
+}

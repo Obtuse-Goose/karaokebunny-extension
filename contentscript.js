@@ -128,6 +128,7 @@ let KaraokeBunny = {
 						$("#karaokebunny-downvote-dialog").dialog({
 							resizable: false,
 							classes: {
+								"ui-dialog": "ui-dialog karaokebunny-dialog-font",
 								"ui-dialog-titlebar": "ui-dialog-titlebar karaokebunny-no-close"
 							},
 							height: "auto",
