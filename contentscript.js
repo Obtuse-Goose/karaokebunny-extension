@@ -2,7 +2,6 @@ if (typeof chrome !== 'undefined') {var browser = chrome;}
 
 let KaraokeBunny = {
 	loaded: false,
-	videoEnded: false,
 	popped: false,
 	connect: function() {
         KaraokeBunny.backgroundPort = browser.runtime.connect({name: 'karaokebunny-content-script'});
@@ -36,9 +35,10 @@ let KaraokeBunny = {
 		}
 		setInterval(countdown, 1000);
 	},
+	videoStart: function() {
+		$('.karaokebunny-loading-spinner').hide();
+	},
 	videoEnded: function() {
-		KaraokeBunny.videoEnded = true;
-
 		let currentSong = KaraokeBunny.queue[0];
 
 		if (KaraokeBunny.queue.length > 1) {
@@ -383,6 +383,10 @@ let KaraokeBunny = {
 		let videoContainer = document.createElement("div");
 		videoContainer.className = 'karaokebunny-main-video';
 
+		let spinner = document.createElement("span");
+		spinner.className = 'karaokebunny-loading-spinner';
+		videoContainer.appendChild(spinner);
+
 		//videoContainer.appendChild(document.getElementById('player'));
 		videoContainer.appendChild(KaraokeBunny.video);
 		mainInner.appendChild(videoContainer);
@@ -410,13 +414,14 @@ let KaraokeBunny = {
 		
 		// Setup video finish event handler
 		//console.log(KaraokeBunny.video);
+		KaraokeBunny.video.addEventListener('canplay', KaraokeBunny.videoStart);
 		KaraokeBunny.video.addEventListener('ended', KaraokeBunny.videoEnded);
 		//console.log(video);
 		//console.log($('#ytd-player'));
 
 		if (KaraokeBunnyUtil.isDevMode()) {
 			console.log('dev mode');
-			KaraokeBunny.video.pause();
+			//KaraokeBunny.video.pause();
 		}
 		else {
 			KaraokeBunny.video.play();
