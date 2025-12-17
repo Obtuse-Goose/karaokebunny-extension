@@ -129,6 +129,12 @@ let KaraokeBunny = {
 			if (document.title == 'Welcome to KaraokeBunny - YouTube') {
 				$('.karaokebunny-current-title').text('Welcome to Karaoke Bunny');
 			}
+			else {
+				$('.karaokebunny-current-title').text('Queue empty');
+				$('.karaokebunny-current-artist').text('Time for another song?');
+				$('.karaokebunny-current-duration').text('');
+			}
+			$('body').fadeIn("slow");
 			return;
 		}
 
@@ -279,7 +285,20 @@ let KaraokeBunny = {
 		currentDuration.className = "karaokebunny-current-duration";
 		//let addedByDiv = document.createElement("div");
 		//addedByDiv.className = "karaokebunny-added-by";
+
+		/*
+		let upvoteButton = document.createElement("button");
+		upvoteButton.className = 'karaokebunny-popout-button';
+		upvoteButton.title = 'This is a great karaoke version of the song!';
+		let upvoteImage = document.createElement("img");
+		upvoteImage.src = KaraokeBunnyUtil.getURL('img/popout.png');
+		upvoteImage.className = 'karaokebunny-button-image karaokebunny-button-popout';
+		upvoteButton.appendChild(upvoteImage);
+		//$(upvoteButton).on("click", KaraokeBunny.upvoteClick);
+		*/
+
 		footer.appendChild(currentTitle);
+		//footer.appendChild(upvoteButton);
 		footer.appendChild(currentArtist);
 		footer.appendChild(currentDuration);
 		//footer.appendChild(addedByDiv);
@@ -374,8 +393,10 @@ let KaraokeBunny = {
 					}
 				}
 			});
-			KaraokeBunny.timer = setInterval(KaraokeBunny.refresh, 5000);
+			// Connect to background script
 			KaraokeBunny.connect();
+			// Set refresh timer
+			KaraokeBunny.timer = setInterval(KaraokeBunny.refresh, 5000);
 			KaraokeBunny.loaded = true;
 		});
 	}
