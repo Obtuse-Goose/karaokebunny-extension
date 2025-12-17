@@ -421,7 +421,7 @@ let KaraokeBunny = {
 
 		if (KaraokeBunnyUtil.isDevMode()) {
 			console.log('dev mode');
-			//KaraokeBunny.video.pause();
+			KaraokeBunny.video.pause();
 		}
 		else {
 			KaraokeBunny.video.play();
