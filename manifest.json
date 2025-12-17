@@ -48,6 +48,7 @@
             "run_at": "document_start",
             "js": [
                 "libs\/jquery-3.6.0.min.js",
+                "libs\/jquery-ui-1.14.1.min.js",
                 "libs\/qrcode.min.js",
                 "utility.js",
                 "contentscript.js"
@@ -62,6 +63,9 @@
         {
             "resources": [
                 "karaokebunny.css",
+                "libs\/jquery-ui.min.css",
+                "libs\/jquery-ui.structure.min.css",
+                "libs\/jquery-ui.theme.min.css",
                 "img\/*"
             ],
             "matches": [

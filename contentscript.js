@@ -107,6 +107,61 @@ let KaraokeBunny = {
 			this.title = 'Enter fullscreen mode';
 		}
 	},
+	upvoteClick: function() {
+		$.ajax({
+			url: 'https://api.karaokebunny.com/video/upvote/' + KaraokeBunny.nowPlaying, 
+			method: 'POST',
+			crossDomain: true
+		});
+	},
+	downvoteClick: function() {
+		KaraokeBunny.video.pause();
+		$.ajax({
+			url: 'https://api.karaokebunny.com/video/downvote/' + KaraokeBunny.roomCode + '/' + KaraokeBunny.nowPlaying, 
+			method: 'POST',
+			crossDomain: true,
+			success: function(response) {
+				response = JSON.parse(response);
+				if (response.alternative_video_id) {
+					let alternative_video_id = response.alternative_video_id;
+					$(function() {
+						$("#karaokebunny-downvote-dialog").dialog({
+							resizable: false,
+							classes: {
+								"ui-dialog-titlebar": "ui-dialog-titlebar karaokebunny-no-close"
+							},
+							height: "auto",
+							width: 400,
+							modal: true,
+							buttons: {
+								"Switch": function() {
+									$(this).dialog("close");
+									$.ajax({
+										url: 'https://api.karaokebunny.com/video/switch/' + KaraokeBunny.roomCode + '/' + alternative_video_id, 
+										method: 'POST',
+										crossDomain: true,
+										success: function(response) {
+											window.location = 'https://www.youtube.com/watch?v=' + alternative_video_id + '#KaraokeBunny';
+										}
+									});
+								},
+								"Keep Playing": function() {
+									$(this).dialog("close");
+									KaraokeBunny.video.play();
+								},
+								"Skip Song": function() {
+									$(this).dialog("close");
+									if (KaraokeBunny.queue.length > 1) {
+										KaraokeBunny.nextSong(KaraokeBunny.queue[1]);
+									}
+								}
+							}
+						});
+					} );
+				}
+			}
+		});
+	},
 	refresh: function() {
 		$.ajax({
 			url: 'https://api.karaokebunny.com/queue/' + KaraokeBunny.roomCode, 
@@ -193,8 +248,11 @@ let KaraokeBunny = {
 		body.hide();
 
 		console.log('KaraokeBunny running');
-		KaraokeBunnyUtil.injectCSSFile(KaraokeBunnyUtil.getURL("karaokebunny.css"));
 		KaraokeBunnyUtil.injectCSSFile("https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap");
+		KaraokeBunnyUtil.injectCSSFile(KaraokeBunnyUtil.getURL("karaokebunny.css"));
+		KaraokeBunnyUtil.injectCSSFile(KaraokeBunnyUtil.getURL("libs/jquery-ui.min.css"));
+		KaraokeBunnyUtil.injectCSSFile(KaraokeBunnyUtil.getURL("libs/jquery-ui.structure.min.css"));
+		KaraokeBunnyUtil.injectCSSFile(KaraokeBunnyUtil.getURL("libs/jquery-ui.theme.min.css"));
 
 		let player = null;
 
@@ -216,7 +274,7 @@ let KaraokeBunny = {
 		header.appendChild(headerText);
 
 		let playButton = document.createElement("button");
-		playButton.className = 'karaokebunny-play-button';
+		playButton.className = 'karaokebunny-button karaokebunny-play-button';
 		playButton.title = 'Play';
 		let playImage = document.createElement("img");
 		playImage.src = KaraokeBunnyUtil.getURL('img/play.png');
@@ -225,7 +283,7 @@ let KaraokeBunny = {
 
 		$(playButton).on("click", KaraokeBunny.playButtonClick);
 		let pauseButton = document.createElement("button");
-		pauseButton.className = 'karaokebunny-pause-button';
+		pauseButton.className = 'karaokebunny-button karaokebunny-pause-button';
 		pauseButton.title = 'Pause';
 		let pauseImage = document.createElement("img");
 		pauseImage.src = KaraokeBunnyUtil.getURL('img/pause.png');
@@ -247,7 +305,7 @@ let KaraokeBunny = {
 		$(parentalControlCheckbox).on("change", KaraokeBunny.toggleParentalControl);
 
 		let fullscreenButton = document.createElement("button");
-		fullscreenButton.className = 'karaokebunny-fullscreen-button';
+		fullscreenButton.className = 'karaokebunny-button karaokebunny-fullscreen-button';
 		fullscreenButton.title = 'Enter fullscreen mode';
 		let fullscreenImage = document.createElement("img");
 		fullscreenImage.src = KaraokeBunnyUtil.getURL('img/fullscreen.png');
@@ -257,7 +315,7 @@ let KaraokeBunny = {
 		$(fullscreenButton).on("click", KaraokeBunny.setFullScreen);
 
 		let popoutButton = document.createElement("button");
-		popoutButton.className = 'karaokebunny-popout-button';
+		popoutButton.className = 'karaokebunny-button karaokebunny-popout-button';
 		popoutButton.title = 'Popout Song Queue';
 		let popoutImage = document.createElement("img");
 		popoutImage.src = KaraokeBunnyUtil.getURL('img/popout.png');
@@ -277,7 +335,7 @@ let KaraokeBunny = {
 		// Create footer for currently playing and up next
 		let footer = document.createElement("div");
 		footer.className = "karaokebunny-footer";
-		let currentTitle = document.createElement("div");
+		let currentTitle = document.createElement("span");
 		currentTitle.className = "karaokebunny-current-title";
 		let currentArtist = document.createElement("span");
 		currentArtist.className = "karaokebunny-current-artist";
@@ -286,19 +344,30 @@ let KaraokeBunny = {
 		//let addedByDiv = document.createElement("div");
 		//addedByDiv.className = "karaokebunny-added-by";
 
-		/*
+		
 		let upvoteButton = document.createElement("button");
-		upvoteButton.className = 'karaokebunny-popout-button';
+		upvoteButton.className = 'karaokebunny-button karaokebunny-upvote-button';
 		upvoteButton.title = 'This is a great karaoke version of the song!';
 		let upvoteImage = document.createElement("img");
-		upvoteImage.src = KaraokeBunnyUtil.getURL('img/popout.png');
-		upvoteImage.className = 'karaokebunny-button-image karaokebunny-button-popout';
+		upvoteImage.src = KaraokeBunnyUtil.getURL('img/thumbup.png');
+		upvoteImage.className = 'karaokebunny-button-image';
 		upvoteButton.appendChild(upvoteImage);
-		//$(upvoteButton).on("click", KaraokeBunny.upvoteClick);
-		*/
+		$(upvoteButton).on("click", KaraokeBunny.upvoteClick);
+		
+		let downvoteButton = document.createElement("button");
+		downvoteButton.className = 'karaokebunny-button karaokebunny-downvote-button';
+		downvoteButton.title = "This is not the right song, or it's not a karaoke version";
+		let downvoteImage = document.createElement("img");
+		downvoteImage.src = KaraokeBunnyUtil.getURL('img/thumbdown.png');
+		downvoteImage.className = 'karaokebunny-button-image';
+		downvoteButton.appendChild(downvoteImage);
+		$(downvoteButton).on("click", KaraokeBunny.downvoteClick);
 
+		let br = document.createElement("br");
 		footer.appendChild(currentTitle);
-		//footer.appendChild(upvoteButton);
+		footer.appendChild(upvoteButton);
+		footer.appendChild(downvoteButton);
+		footer.appendChild(br);
 		footer.appendChild(currentArtist);
 		footer.appendChild(currentDuration);
 		//footer.appendChild(addedByDiv);
@@ -323,6 +392,14 @@ let KaraokeBunny = {
 		newBody.appendChild(header);
 		newBody.appendChild(main);
 		newBody.appendChild(sidebar);
+
+		// Downvote dialog
+		let downvoteDialog = document.createElement("div");
+		downvoteDialog.id = 'karaokebunny-downvote-dialog';
+		downvoteDialog.title = 'Change Video';
+		let downvoteDialogText = document.createTextNode("There is at least one alternative video available for this song. Would you like to switch to another one?");
+		downvoteDialog.appendChild(downvoteDialogText);
+		newBody.appendChild(downvoteDialog);
 		
 		//$('#masthead').replaceWith(header);
 		//$('#secondary').replaceWith(sidebar);

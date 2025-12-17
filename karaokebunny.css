@@ -48,7 +48,7 @@ body {
     line-height: 48pt;
 }
 
-.karaokebunny-header button {
+.karaokebunny-button {
     position: absolute;
 	z-index: 10000;
 	top: 10px;
@@ -349,4 +349,21 @@ span#karaokebunny-qrcode img {
 .karaokebunny-added-by {
     font-size: 20pt;
     color: var(--main-color);
+}
+
+.karaokebunny-upvote-button {
+    position: relative;
+    top: 10px;
+    right: 125px;
+    float: right;
+}
+.karaokebunny-downvote-button {
+    position: relative;
+    top: 10px;
+    right: 10px;
+    float: right;
+}
+
+.karaokebunny-no-close .ui-dialog-titlebar-close {
+  display: none;
 }

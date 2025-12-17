@@ -36,7 +36,7 @@ $(document).ready(function() {
     newBody.className = 'karaokebunny-popped';
 
     let popoutButton = document.createElement("button");
-    popoutButton.className = 'karaokebunny-popout-button';
+    popoutButton.className = 'karaokebunny-button karaokebunny-popout-button';
     popoutButton.title = 'Unpop Song Queue';
     let popoutImage = document.createElement("img");
     popoutImage.src = KaraokeBunnyUtil.getURL('img/unpop.png');
