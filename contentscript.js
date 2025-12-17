@@ -68,7 +68,7 @@ let KaraokeBunny = {
 			KaraokeBunny.showSongQueue();
 		}
 		else {
-			KaraokeBunnyUtil.sendMessage({name: "pop", width: Math.round(screen.width), roomCode: KaraokeBunny.roomCode, queue: KaraokeBunny.queue, currentPosition: KaraokeBunny.currentPosition});
+			KaraokeBunnyUtil.sendMessage({name: "pop", width: Math.round(screen.width), height: Math.round(screen.height), roomCode: KaraokeBunny.roomCode, queue: KaraokeBunny.queue, currentPosition: KaraokeBunny.currentPosition});
 			$(".karaokebunny-sidebar").hide();
 			$(".karaokebunny-main").addClass('karaokebunny-popped');
 			KaraokeBunny.popped = true;

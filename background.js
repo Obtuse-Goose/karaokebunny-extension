@@ -26,6 +26,7 @@ function onRequest(request, sender, sendResponse) {
 			url: getURL('queue.html'),
 			type: 'popup',
 			width: 800,
+			height: request.height,
 			left: request.width - 800
 		}, function (newWindow) {
 			KaraokeBunny.popupWindow = newWindow;
